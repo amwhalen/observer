@@ -39,10 +39,12 @@ The following actions are logged for ANY user:
 Some actions that change data will show what the value was before and after.
 
 Below is an example of a log entry when the user 'smith' has changed the Network site name from "WP Local Network" to "WP Local Networks":
+
 `[Tue, 03 Sep 2013 13:45:49 +0000] [smith:1] [update_site_option] [1] [site_name] [(WP Local Network)->(WP Local Networks)] [127.0.0.1]`
 
 Each line in the log file will roughly follow the below example.
 Individual actions may log slightly different information, but the DATETIME, USERNAME, USER_ID, ACTION, and IP_ADDRESS sections should always be populated.
+
 `[DATETIME] [USERNAME:USER_ID] [ACTION] [AFFECTED_OBJECT_ID] [DATA_TITLE_OR_KEY] [(VALUE_BEFORE)->(VALUE_AFTER)] [IP_ADDRESS]`
 
 == Installation ==
@@ -62,5 +64,5 @@ None yet.
 == Changelog ==
 
 = 1.0.0 =
-Initial release.
+* Initial release.
 
