@@ -110,11 +110,16 @@ class AMWObserver {
 	 */
 	public function log_updated_option($option, $oldvalue, $newvalue) {
 		
-		// ignore transients
-		if (preg_match('/.*_transient_.*/i', $option)) return;
-		
-		// ignore 'wp_ID_user_roles' changes
-		if (preg_match('/.*user_roles$/i', $option)) return;
+		// ignore options matching these regexes
+		$ignores = array(
+			'/.*_transient_.*/i',
+			'/.*user_roles$/i',
+			'/^stats_cache$/i'
+		);
+
+		foreach ($ignores as $r) {
+			if (preg_match($r, $option)) return;
+		}
 
 		// convert values to strings
 		$oldvalue = (is_array($oldvalue) || is_object($oldvalue)) ? serialize($oldvalue) : $oldvalue;
