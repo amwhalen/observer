@@ -63,6 +63,9 @@ None yet.
 
 == Changelog ==
 
+= 1.0.1 =
+* Added some more ignored option updates.
+
 = 1.0.0 =
 * Initial release.
 
