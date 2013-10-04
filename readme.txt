@@ -63,6 +63,9 @@ None yet.
 
 == Changelog ==
 
+= 1.0.2 =
+* Made the 'active_plugins' option log more readable by identifying which plugin was activated or deactivated.
+
 = 1.0.1 =
 * Added some more ignored option updates.
 
