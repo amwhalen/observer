@@ -3,7 +3,7 @@
 class AMWObserver {
 
 	protected $logfile;
-	protected $version = '1.0.1';
+	protected $version = '1.0.2';
 
 	/**
 	 * Constructor
@@ -121,12 +121,55 @@ class AMWObserver {
 			if (preg_match($r, $option)) return;
 		}
 
-		// convert values to strings
-		$oldvalue = (is_array($oldvalue) || is_object($oldvalue)) ? serialize($oldvalue) : $oldvalue;
-		$newvalue = (is_array($newvalue) || is_object($newvalue)) ? serialize($newvalue) : $newvalue;
-		$data = sprintf("(%s)->(%s)", $oldvalue, $newvalue);
+		// handle this option separately?
+		$specialHandler = 'handle_option_' . $option;
+		if (method_exists($this, $specialHandler)) {
+
+			call_user_func(array(&$this, $specialHandler));
+
+		} else {
+
+			// convert values to strings
+			$oldvalue = (is_array($oldvalue) || is_object($oldvalue)) ? serialize($oldvalue) : $oldvalue;
+			$newvalue = (is_array($newvalue) || is_object($newvalue)) ? serialize($newvalue) : $newvalue;
+			$data = sprintf("(%s)->(%s)", $oldvalue, $newvalue);
+			$blogId = get_current_blog_id();
+			$this->log('updated_option', $blogId, $option, $data);
+
+		}
+
+	}
+
+	/**
+	 * Logs when 'active_plugins' option is updated.
+	 * @param  string $option   The name of the option that was changed.
+	 * @param  mixed  $newvalue The new value for the option.
+	 * @param  mixed  $oldvalue The old value for the option.
+	 * @return void
+	 */
+	public function handle_option_active_plugins($option, $oldvalue, $newvalue) {
+
+		// make sure we work with arrays
+		$oldvalue = (is_array($oldvalue)) ? $oldvalue : array();
+		$newvalue = (is_array($newvalue)) ? $newvalue : array();
+
+		// get changes
+		$deactivated = array_diff($oldvalue, $newvalue);
+		$activated   = array_diff($newvalue, $oldvalue);
+
+		// make a readable representation of the changes
+		$data = '';
+		if (count($deactivated)) {
+			$data .= '(DEACTIVATED: "' . implode('","', $deactivated) . '")';
+		}
+		if (count($activated)) {
+			$data .= '(ACTIVATED: "' . implode('","', $activated) . '")';
+		}
+
+		// log it
 		$blogId = get_current_blog_id();
 		$this->log('updated_option', $blogId, $option, $data);
+
 	}
 
 	/**
