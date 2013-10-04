@@ -125,7 +125,7 @@ class AMWObserver {
 		$specialHandler = 'handle_option_' . $option;
 		if (method_exists($this, $specialHandler)) {
 
-			call_user_func(array(&$this, $specialHandler));
+			call_user_func(array(&$this, $specialHandler), $option, $oldvalue, $newvalue);
 
 		} else {
 
