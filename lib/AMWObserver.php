@@ -3,7 +3,7 @@
 class AMWObserver {
 
 	protected $logfile;
-	protected $version = '1.0.2';
+	protected $version = '1.0.3';
 
 	/**
 	 * Constructor
@@ -93,12 +93,29 @@ class AMWObserver {
 	public function log_update_site_option($option, $newvalue, $oldvalue) {
 		// ignore transients
 		if (preg_match('/.*_transient_.*/i', $option)) return;
-		// convert values to strings
-		$oldvalue = (is_array($oldvalue) || is_object($oldvalue)) ? serialize($oldvalue) : $oldvalue;
-		$newvalue = (is_array($newvalue) || is_object($newvalue)) ? serialize($newvalue) : $newvalue;
-		$data = sprintf("(%s)->(%s)", $oldvalue, $newvalue);
-		$site = get_current_site();
-		$this->log('update_site_option', $site->id, $option, $data);
+
+		// handle this option separately?
+		$optionsWithArrayValues = array(
+			'site_admins',
+			'active_sitewide_plugins',
+		);
+
+		// log
+		//if (in_array($option, $optionsWithArrayValues)) {
+		if (is_array($oldvalue) || is_array($newvalue)) {
+
+			$this->handle_option_arrays('update_site_option', $option, $oldvalue, $newvalue);
+
+		} else {
+
+			// convert values to strings
+			$oldvalue = (is_array($oldvalue) || is_object($oldvalue)) ? serialize($oldvalue) : $oldvalue;
+			$newvalue = (is_array($newvalue) || is_object($newvalue)) ? serialize($newvalue) : $newvalue;
+			$data = sprintf("(%s)->(%s)", $oldvalue, $newvalue);
+			$site = get_current_site();
+			$this->log('update_site_option', $site->id, $option, $data);
+
+		}
 	}
 
 	/**
@@ -122,10 +139,14 @@ class AMWObserver {
 		}
 
 		// handle this option separately?
-		$specialHandler = 'handle_option_' . $option;
-		if (method_exists($this, $specialHandler)) {
+		$optionsWithArrayValues = array(
+			'recently_edited',
+		);
 
-			call_user_func(array(&$this, $specialHandler), $option, $oldvalue, $newvalue);
+		//if (in_array($option, $optionsWithArrayValues)) {
+		if (is_array($oldvalue) || is_array($newvalue)) {
+
+			$this->handle_option_arrays('updated_option', $option, $oldvalue, $newvalue);
 
 		} else {
 
@@ -141,35 +162,62 @@ class AMWObserver {
 	}
 
 	/**
-	 * Logs when 'active_plugins' option is updated.
+	 * Logs the difference in options that store serialized arrays.
+	 * Makes the differences easier to spot and read.
+	 * 
+	 * @param  string $action   The triggered action.
 	 * @param  string $option   The name of the option that was changed.
 	 * @param  mixed  $newvalue The new value for the option.
 	 * @param  mixed  $oldvalue The old value for the option.
 	 * @return void
 	 */
-	public function handle_option_active_plugins($option, $oldvalue, $newvalue) {
+	public function handle_option_arrays($action, $option, $oldvalue, $newvalue) {
 
 		// make sure we work with arrays
 		$oldvalue = (is_array($oldvalue)) ? $oldvalue : array();
 		$newvalue = (is_array($newvalue)) ? $newvalue : array();
 
 		// get changes
-		$deactivated = array_diff($oldvalue, $newvalue);
-		$activated   = array_diff($newvalue, $oldvalue);
+		if ($this->is_assoc($oldvalue) || $this->is_assoc($newvalue)) {
+			$deactivated = array_diff_assoc($oldvalue, $newvalue);
+			$activated   = array_diff_assoc($newvalue, $oldvalue);
+		} else {
+			$deactivated = array_diff($oldvalue, $newvalue);
+			$activated   = array_diff($newvalue, $oldvalue);
+		}
 
 		// make a readable representation of the changes
 		$data = '';
 		if (count($deactivated)) {
-			$data .= '(DEACTIVATED: "' . implode('","', $deactivated) . '")';
+			$withKeys = array();
+			foreach ($deactivated as $k=>$v) {
+				$withKeys[] = $k.' => '.$v;
+			}
+			$deactivatedStr = '"' . implode('","', $withKeys) . '"';
+			$data .= '(removed: '.$deactivatedStr.')';
 		}
 		if (count($activated)) {
-			$data .= '(ACTIVATED: "' . implode('","', $activated) . '")';
+			$withKeys = array();
+			foreach ($activated as $k=>$v) {
+				$withKeys[] = $k.' => '.$v;
+			}
+			$activatedStr = '"' . implode('","', $withKeys) . '"';
+			$data .= '(added: '.$activatedStr.')';
 		}
 
 		// log it
 		$blogId = get_current_blog_id();
-		$this->log('updated_option', $blogId, $option, $data);
+		$this->log($action, $blogId, $option, $data);
 
+	}
+
+	/**
+	 * Returns true if the given array is associative.
+	 * @param  array  $array The array to check.
+	 * @return boolean 
+	 */
+	private function is_assoc($array) {
+		return (bool)count(array_filter(array_keys($array), 'is_string'));
 	}
 
 	/**
