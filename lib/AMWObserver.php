@@ -138,12 +138,6 @@ class AMWObserver {
 			if (preg_match($r, $option)) return;
 		}
 
-		// handle this option separately?
-		$optionsWithArrayValues = array(
-			'recently_edited',
-		);
-
-		//if (in_array($option, $optionsWithArrayValues)) {
 		if (is_array($oldvalue) || is_array($newvalue)) {
 
 			$this->handle_option_arrays('updated_option', $option, $oldvalue, $newvalue);
