@@ -63,6 +63,9 @@ None yet.
 
 == Changelog ==
 
+= 1.0.3 =
+* Added better logging for all options that store arrays, so the log shows only what was added or removed.
+
 = 1.0.2 =
 * Made the 'active_plugins' option log more readable by identifying which plugin was activated or deactivated.
 
