@@ -2,7 +2,7 @@
 Contributors: anukit
 Tags: logging, audit, network, multisite, admin
 Requires at least: 3.0
-Tested up to: 3.6
+Tested up to: 4.5
 Stable tag: trunk
 License: The MIT License
 License URI: http://opensource.org/licenses/MIT
@@ -62,6 +62,9 @@ None yet.
 None yet.
 
 == Changelog ==
+
+= 1.0.4 =
+* Compatible with WP 4.4.2.
 
 = 1.0.3 =
 * Added better logging for all options that store arrays, so the log shows only what was added or removed.

@@ -3,7 +3,7 @@
 class AMWObserver {
 
 	protected $logfile;
-	protected $version = '1.0.3';
+	protected $version = '1.0.4';
 
 	/**
 	 * Constructor
@@ -126,7 +126,7 @@ class AMWObserver {
 	 * @return void
 	 */
 	public function log_updated_option($option, $oldvalue, $newvalue) {
-		
+
 		// ignore options matching these regexes
 		$ignores = array(
 			'/.*_transient_.*/i',
@@ -158,7 +158,7 @@ class AMWObserver {
 	/**
 	 * Logs the difference in options that store serialized arrays.
 	 * Makes the differences easier to spot and read.
-	 * 
+	 *
 	 * @param  string $action   The triggered action.
 	 * @param  string $option   The name of the option that was changed.
 	 * @param  mixed  $newvalue The new value for the option.
@@ -208,7 +208,7 @@ class AMWObserver {
 	/**
 	 * Returns true if the given array is associative.
 	 * @param  array  $array The array to check.
-	 * @return boolean 
+	 * @return boolean
 	 */
 	private function is_assoc($array) {
 		return (bool)count(array_filter(array_keys($array), 'is_string'));
@@ -374,7 +374,7 @@ class AMWObserver {
 
 	/**
 	 * Logs edit_user_profile_update - after a user's profile has been edited by someone else.
-	 * 
+	 *
 	 * @param  int $userId The user that was edited.
 	 * @return void
 	 */

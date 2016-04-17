@@ -3,7 +3,7 @@
 Plugin Name: Observer
 Plugin URI: http://amwhalen.com
 Description: Creates an audit trail log file for multisite super admin actions. Used only for multisite installations, and must be Network Activated.
-Version: 1.0.3
+Version: 1.0.4
 Author: Andy Whalen
 Author URI: http://amwhalen.com
 License: The MIT License
